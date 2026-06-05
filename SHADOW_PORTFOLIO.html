@@ -1,0 +1,2097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shuvro — Backend & Telegram Infrastructure Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #080808;
+  --bg2: #0e0e0e;
+  --bg3: #141414;
+  --bg4: #1a1a1a;
+  --border: rgba(255,255,255,0.07);
+  --border-hover: rgba(220,20,60,0.35);
+  --accent: #dc143c;
+  --accent-dim: rgba(220,20,60,0.12);
+  --accent-glow: rgba(220,20,60,0.08);
+  --red2: #8b0000;
+  --text: #e8e8e8;
+  --text2: #888;
+  --text3: #555;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --radius: 6px;
+  --radius-lg: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── GRID BACKGROUND ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(8,8,8,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+}
+
+.nav-logo {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-logo .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid rgba(220,20,60,0.4);
+  padding: 7px 18px;
+  border-radius: var(--radius);
+  letter-spacing: 0.06em;
+  transition: all 0.2s;
+  background: var(--accent-glow);
+}
+
+.nav-cta:hover {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+/* ── SECTIONS ── */
+section { position: relative; z-index: 1; }
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding-top: 56px;
+}
+
+.hero-inner {
+  padding: 100px 0 80px;
+  max-width: 760px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid rgba(220,20,60,0.25);
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--accent-glow);
+  margin-bottom: 32px;
+}
+
+.hero-tag::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+h1 {
+  font-family: var(--mono);
+  font-size: clamp(36px, 5vw, 60px);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+h1 span.dim { color: var(--text3); }
+h1 span.accent { color: var(--accent); }
+
+.hero-subtitle {
+  font-family: var(--mono);
+  font-size: clamp(13px, 1.8vw, 16px);
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 560px;
+}
+
+.hero-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 48px;
+}
+
+.role-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text2);
+  border: 1px solid var(--border);
+  padding: 5px 12px;
+  border-radius: 100px;
+  background: var(--bg2);
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+
+.role-badge:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+  background: var(--accent-glow);
+}
+
+.hero-stats {
+  display: flex;
+  gap: 40px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+.stat { }
+
+.stat-num {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.04em;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+
+.btn-primary:hover {
+  background: #c01235;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.15);
+  background: var(--bg4);
+  transform: translateY(-1px);
+}
+
+/* ── SECTION HEADERS ── */
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, rgba(220,20,60,0.3), transparent);
+  max-width: 100px;
+}
+
+.section-title {
+  font-family: var(--mono);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+
+.section-desc {
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text2);
+  max-width: 520px;
+  line-height: 1.7;
+  margin-bottom: 56px;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(220,20,60,0.25), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.card:hover::before { opacity: 1; }
+
+.card:hover {
+  border-color: rgba(220,20,60,0.2);
+  background: var(--bg3);
+  transform: translateY(-2px);
+}
+
+/* ── EXPERTISE ── */
+#expertise { padding: 100px 0; }
+
+.expertise-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.expertise-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.expertise-card:hover {
+  border-color: rgba(220,20,60,0.2);
+  background: var(--bg3);
+  transform: translateY(-2px);
+}
+
+.exp-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--radius);
+  background: var(--accent-dim);
+  border: 1px solid rgba(220,20,60,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-family: var(--mono);
+  font-size: 16px;
+}
+
+.exp-title {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
+.exp-desc {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  border: 1px solid var(--border);
+  padding: 3px 9px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+  background: var(--bg3);
+}
+
+/* ── PROJECTS ── */
+#projects { padding: 100px 0; border-top: 1px solid var(--border); }
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.project-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+.project-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 60px;
+  background: linear-gradient(to top, var(--bg2), transparent);
+  pointer-events: none;
+}
+
+.project-card:hover {
+  border-color: rgba(220,20,60,0.2);
+  background: var(--bg3);
+  transform: translateY(-2px);
+}
+
+.project-card:hover::after {
+  background: linear-gradient(to top, var(--bg3), transparent);
+}
+
+.project-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.project-name {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.project-concept {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project-status {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #22c55e;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.2);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.project-status::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.project-desc {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+
+.project-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.project-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.project-tech {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.project-complexity {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.complexity-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.complexity-dot.empty {
+  background: var(--bg4);
+  border: 1px solid var(--text3);
+}
+
+/* ── FEATURED: VAULTFLOW ── */
+#featured { padding: 100px 0; border-top: 1px solid var(--border); }
+
+.featured-card {
+  background: var(--bg2);
+  border: 1px solid rgba(220,20,60,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.featured-header {
+  padding: 40px 40px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.featured-title {
+  font-family: var(--mono);
+  font-size: clamp(20px, 2.5vw, 28px);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.featured-sub {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.featured-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
+.badge-red {
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(220,20,60,0.25);
+}
+
+.badge-gray {
+  color: var(--text2);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+}
+
+.featured-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+@media (max-width: 700px) {
+  .featured-body { grid-template-columns: 1fr; }
+}
+
+.featured-desc {
+  padding: 32px 40px;
+  border-right: 1px solid var(--border);
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.75;
+}
+
+@media (max-width: 700px) {
+  .featured-desc { border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+.featured-systems {
+  padding: 32px 40px;
+}
+
+.systems-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+}
+
+.system-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.system-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.system-item::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+
+/* ── ARCHITECTURE ── */
+#architecture { padding: 100px 0; border-top: 1px solid var(--border); }
+
+.arch-diagram {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  overflow-x: auto;
+}
+
+.arch-flow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  min-width: 600px;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.arch-node {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  text-align: center;
+  min-width: 110px;
+}
+
+.arch-node-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.arch-node-sub {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text3);
+}
+
+.arch-node.accent-node {
+  border-color: rgba(220,20,60,0.3);
+  background: var(--accent-dim);
+}
+
+.arch-node.accent-node .arch-node-label { color: var(--accent); }
+
+.arch-arrow {
+  color: var(--text3);
+  font-family: var(--mono);
+  font-size: 16px;
+  padding: 0 8px;
+  flex-shrink: 0;
+}
+
+.arch-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.arch-down {
+  color: var(--text3);
+  font-size: 16px;
+  font-family: var(--mono);
+  line-height: 1;
+  padding: 4px 0;
+}
+
+/* ── TELEGRAM INFRA ── */
+#telegram { padding: 100px 0; border-top: 1px solid var(--border); }
+
+.tg-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 700px) {
+  .tg-grid { grid-template-columns: 1fr; }
+}
+
+.tg-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  transition: all 0.25s;
+}
+
+.tg-card:hover {
+  border-color: rgba(220,20,60,0.2);
+  background: var(--bg3);
+}
+
+.tg-number {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.tg-name {
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.tg-desc {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ── STACK ── */
+#stack { padding: 100px 0; border-top: 1px solid var(--border); }
+
+.stack-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stack-group {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.stack-group-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.stack-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stack-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stack-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+.stack-bar {
+  width: 60px;
+  height: 3px;
+  background: var(--bg4);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.stack-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ── GITHUB ACTIVITY ── */
+#activity { padding: 100px 0; border-top: 1px solid var(--border); }
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .activity-grid { grid-template-columns: 1fr; }
+}
+
+.commit-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.commit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.commit-item:last-child { border-bottom: none; }
+
+.commit-hash {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid rgba(220,20,60,0.2);
+  padding: 3px 7px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.commit-msg {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.commit-meta {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.contrib-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.contrib-row {
+  display: flex;
+  gap: 3px;
+}
+
+.contrib-cell {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--bg4);
+  flex-shrink: 0;
+}
+
+.contrib-cell.l1 { background: rgba(220,20,60,0.18); }
+.contrib-cell.l2 { background: rgba(220,20,60,0.38); }
+.contrib-cell.l3 { background: rgba(220,20,60,0.62); }
+.contrib-cell.l4 { background: var(--accent); }
+
+/* ── CONTACT ── */
+#contact {
+  padding: 100px 0 80px;
+  border-top: 1px solid var(--border);
+}
+
+.contact-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .contact-inner { grid-template-columns: 1fr; }
+}
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s;
+}
+
+.contact-link:hover {
+  border-color: rgba(220,20,60,0.25);
+  background: var(--bg3);
+  transform: translateX(4px);
+}
+
+.contact-link-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius);
+  background: var(--accent-dim);
+  border: 1px solid rgba(220,20,60,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.contact-link-info {
+  flex: 1;
+}
+
+.contact-link-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text3);
+  margin-bottom: 2px;
+}
+
+.contact-link-value {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.contact-link-arrow {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--text3);
+  transition: transform 0.2s;
+}
+
+.contact-link:hover .contact-link-arrow {
+  transform: translateX(2px);
+  color: var(--accent);
+}
+
+.availability-card {
+  background: var(--bg2);
+  border: 1px solid rgba(220,20,60,0.2);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+
+.avail-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.avail-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2s ease infinite;
+}
+
+.avail-text {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #22c55e;
+}
+
+.avail-desc {
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.7;
+  margin-bottom: 24px;
+}
+
+.avail-specialties {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.specialty-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.specialty-item::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-copy {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+}
+
+.footer-copy span { color: var(--accent); }
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+.footer-links a {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--text); }
+
+/* ── TERMINAL BLOCK ── */
+.terminal {
+  background: #0a0a0a;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.t-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+.t-red { background: #ff5f57; }
+.t-yellow { background: #febc2e; }
+.t-green { background: #28c840; }
+
+.terminal-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  margin-left: 8px;
+  letter-spacing: 0.04em;
+}
+
+.terminal-body {
+  padding: 24px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.t-line { }
+.t-prompt { color: var(--accent); }
+.t-cmd { color: var(--text); }
+.t-comment { color: var(--text3); }
+.t-output { color: #22c55e; }
+.t-string { color: #e5c07b; }
+.t-key { color: #61afef; }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 0;
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0 20px; }
+  .container { padding: 0 20px; }
+  .hero-inner { padding: 80px 0 60px; }
+  .hero-stats { gap: 24px; flex-wrap: wrap; }
+  .featured-header { padding: 28px 24px; }
+  .featured-desc, .featured-systems { padding: 24px; }
+  .arch-diagram { padding: 24px; }
+  footer { padding: 24px 20px; }
+  .nav-links { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <span class="dot"></span>
+    SHUVRO.DEV
+  </div>
+  <ul class="nav-links">
+    <li><a href="#expertise">Expertise</a></li>
+    <li><a href="#projects">Systems</a></li>
+    <li><a href="#featured">Featured</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#stack">Stack</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Hire Me →</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-tag">Available for Project Work</div>
+
+      <h1>
+        Backend Systems<br/>
+        <span class="accent">&amp;</span> Telegram<br/>
+        <span class="dim">Infrastructure</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        I build production-grade automation systems, bot platforms,
+        and distributed infrastructure — specializing in Telegram's
+        MTProto layer and Python async architecture.
+      </p>
+
+      <div class="hero-roles">
+        <span class="role-badge">Software Engineer</span>
+        <span class="role-badge">Telegram Infrastructure Architect</span>
+        <span class="role-badge">Automation Systems Engineer</span>
+        <span class="role-badge">Python · Node.js · MongoDB</span>
+      </div>
+
+      <div class="hero-cta">
+        <a href="#projects" class="btn-primary">View My Work →</a>
+        <a href="#contact" class="btn-secondary">Get In Touch</a>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">7+</div>
+          <div class="stat-label">Production Systems</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">13</div>
+          <div class="stat-label">Subsystems in Largest Platform</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Async Architecture</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section id="expertise">
+  <div class="container">
+    <div class="section-label reveal">01 — Expertise</div>
+    <h2 class="section-title reveal">What I Build</h2>
+    <p class="section-desc reveal">
+      From webhook servers to multi-tenant bot platforms — I design
+      systems that are restart-safe, idempotent, and production-ready
+      from day one.
+    </p>
+
+    <div class="expertise-grid">
+      <div class="expertise-card reveal">
+        <div class="exp-icon">⚡</div>
+        <div class="exp-title">Telegram Bot Architecture</div>
+        <div class="exp-desc">
+          Full-stack bot systems using Pyrogram (MTProto) and
+          python-telegram-bot. Webhook mode, async handlers,
+          multi-bot orchestration, and FloodWait recovery built in.
+        </div>
+        <div class="exp-tags">
+          <span class="tag">Pyrogram</span>
+          <span class="tag">MTProto</span>
+          <span class="tag">Webhooks</span>
+          <span class="tag">Async Python</span>
+        </div>
+      </div>
+
+      <div class="expertise-card reveal">
+        <div class="exp-icon">🗄</div>
+        <div class="exp-title">Database & State Design</div>
+        <div class="exp-desc">
+          MongoDB schema design with atomic operations, FSM-driven
+          state machines, event sourcing patterns, and restart-safe
+          recovery flows. Every critical operation is idempotent.
+        </div>
+        <div class="exp-tags">
+          <span class="tag">MongoDB</span>
+          <span class="tag">Redis</span>
+          <span class="tag">Motor (Async)</span>
+          <span class="tag">FSM</span>
+        </div>
+      </div>
+
+      <div class="expertise-card reveal">
+        <div class="exp-icon">🔄</div>
+        <div class="exp-title">Automation Pipelines</div>
+        <div class="exp-desc">
+          Content distribution engines, scheduled posting workers,
+          queue-based media group buffers, and watermark pipelines —
+          designed for zero manual intervention at scale.
+        </div>
+        <div class="exp-tags">
+          <span class="tag">APScheduler</span>
+          <span class="tag">Queue Systems</span>
+          <span class="tag">Media Pipelines</span>
+        </div>
+      </div>
+
+      <div class="expertise-card reveal">
+        <div class="exp-icon">🛡</div>
+        <div class="exp-title">Admin Control Systems</div>
+        <div class="exp-desc">
+          Multi-admin panels with role-based access, AI-powered FAQ
+          handlers, ban/ticket systems, and audit logging. Built
+          for operational teams who need reliability over convenience.
+        </div>
+        <div class="exp-tags">
+          <span class="tag">RBAC</span>
+          <span class="tag">AI FAQ</span>
+          <span class="tag">Audit Logs</span>
+          <span class="tag">Tickets</span>
+        </div>
+      </div>
+
+      <div class="expertise-card reveal">
+        <div class="exp-icon">🌐</div>
+        <div class="exp-title">Full-Stack Bot Dashboards</div>
+        <div class="exp-desc">
+          React + Vite admin dashboards with real-time WebSocket
+          log streaming, multi-bot management, auto-start control,
+          and broadcast tooling — all running over a Node.js backend.
+        </div>
+        <div class="exp-tags">
+          <span class="tag">React</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">WebSocket</span>
+          <span class="tag">Zustand</span>
+        </div>
+      </div>
+
+      <div class="expertise-card reveal">
+        <div class="exp-icon">📱</div>
+        <div class="exp-title">Multi-Platform Messaging</div>
+        <div class="exp-desc">
+          WhatsApp multi-device bots using Baileys, cross-platform
+          automation, and media handling systems — deployed on
+          Railway, Koyeb, and Heroku with persistent sessions.
+        </div>
+        <div class="exp-tags">
+          <span class="tag">WhatsApp Web</span>
+          <span class="tag">Baileys</span>
+          <span class="tag">Session Mgmt</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="section-label reveal">02 — Systems</div>
+    <h2 class="section-title reveal">Client Projects</h2>
+    <p class="section-desc reveal">
+      Production systems built for real clients. Project names
+      have been replaced with architectural concept names to protect
+      client confidentiality.
+    </p>
+
+    <div class="projects-grid">
+
+      <!-- VerifyGate -->
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div>
+            <div class="project-name">VerifyGate</div>
+            <div class="project-concept">Identity Verification System</div>
+          </div>
+          <div class="project-status">DEPLOYED</div>
+        </div>
+        <p class="project-desc">
+          Hybrid Telegram verification gateway. Users submit
+          proof media which routes to all admin IDs and a group
+          control panel simultaneously. Supports approve/reject
+          flows, rule acknowledgement, and resubmission after rejection.
+        </p>
+        <div class="project-meta">
+          <span class="tag">Python</span>
+          <span class="tag">Pyrogram</span>
+          <span class="tag">Admin Panel</span>
+          <span class="tag">Multi-Admin Routing</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-tech">python-telegram-bot · MongoDB</span>
+          <div class="project-complexity">
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot empty"></div>
+            <div class="complexity-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CommandRelay -->
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div>
+            <div class="project-name">CommandRelay</div>
+            <div class="project-concept">Admin Control Infrastructure</div>
+          </div>
+          <div class="project-status">DEPLOYED</div>
+        </div>
+        <p class="project-desc">
+          Webhook-mode admin control bot with persistent connection
+          pooling (8 workers), AI-powered FAQ handler, admin
+          reply routing, ban management, ticket system, and
+          full structured logging. Fault-tolerant by design.
+        </p>
+        <div class="project-meta">
+          <span class="tag">Python</span>
+          <span class="tag">Webhook Mode</span>
+          <span class="tag">AI FAQ</span>
+          <span class="tag">Ticket System</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-tech">python-telegram-bot · MongoDB · OpenAI</span>
+          <div class="project-complexity">
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SupportCore -->
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div>
+            <div class="project-name">SupportCore</div>
+            <div class="project-concept">Modular Support Infrastructure</div>
+          </div>
+          <div class="project-status">DEPLOYED</div>
+        </div>
+        <p class="project-desc">
+          Reusable Telegram support bot framework with ban middleware,
+          environment-based config (zero hardcoded secrets), clean
+          handler registration patterns, and full dotenv support.
+          Architected for team rebranding and rapid deployment.
+        </p>
+        <div class="project-meta">
+          <span class="tag">Python</span>
+          <span class="tag">Middleware</span>
+          <span class="tag">Env Config</span>
+          <span class="tag">Modular</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-tech">Python · Pyrogram · MongoDB</span>
+          <div class="project-complexity">
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot empty"></div>
+            <div class="complexity-dot empty"></div>
+            <div class="complexity-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BotOrchestra -->
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div>
+            <div class="project-name">BotOrchestra</div>
+            <div class="project-concept">Multi-Bot Management Platform</div>
+          </div>
+          <div class="project-status">DEPLOYED</div>
+        </div>
+        <p class="project-desc">
+          Full-stack bot management platform: React + Vite dashboard,
+          real-time WebSocket log streaming (info/warn/error),
+          multi-bot lifecycle control (start, stop, auto-start),
+          broadcast tooling, and per-bot activity feeds.
+        </p>
+        <div class="project-meta">
+          <span class="tag">React</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">WebSocket</span>
+          <span class="tag">Zustand</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-tech">TypeScript · Vite · Tailwind</span>
+          <div class="project-complexity">
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MessengerBridge -->
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div>
+            <div class="project-name">MessengerBridge</div>
+            <div class="project-concept">Multi-Device Messaging Bot</div>
+          </div>
+          <div class="project-status">DEPLOYED</div>
+        </div>
+        <p class="project-desc">
+          Feature-rich WhatsApp multi-device automation bot with
+          pairing code auth, group management, media downloading,
+          sticker/meme generation, and a full React admin
+          dashboard. Deployable on Railway, Koyeb, or Heroku.
+        </p>
+        <div class="project-meta">
+          <span class="tag">Node.js</span>
+          <span class="tag">Baileys</span>
+          <span class="tag">React Dashboard</span>
+          <span class="tag">MongoDB</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-tech">Node.js · WhatsApp Web API</span>
+          <div class="project-complexity">
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot empty"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GroupShield -->
+      <div class="project-card reveal">
+        <div class="project-header">
+          <div>
+            <div class="project-name">GroupShield</div>
+            <div class="project-concept">Group Management Suite</div>
+          </div>
+          <div class="project-status">DEPLOYED</div>
+        </div>
+        <p class="project-desc">
+          Full Telegram group management platform with moderation
+          commands, anti-spam filters, admin tooling, welcome flows,
+          member tracking, and a documentation site in cyberpunk
+          aesthetic. Feature-complete GroupHelp-class system.
+        </p>
+        <div class="project-meta">
+          <span class="tag">Python</span>
+          <span class="tag">Moderation</span>
+          <span class="tag">Anti-Spam</span>
+          <span class="tag">Dashboard</span>
+        </div>
+        <div class="project-footer">
+          <span class="project-tech">Python · Pyrogram · MongoDB</span>
+          <div class="project-complexity">
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+            <div class="complexity-dot"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED: VAULTFLOW -->
+<section id="featured">
+  <div class="container">
+    <div class="section-label reveal">03 — Featured Build</div>
+    <h2 class="section-title reveal">ContentVault Platform</h2>
+    <p class="section-desc reveal">
+      A production-grade Telegram SaaS platform. 13 integrated
+      subsystems, async throughout, zero data loss on restart.
+    </p>
+
+    <div class="featured-card reveal">
+      <div class="featured-header">
+        <div>
+          <div class="featured-title">ContentVault — Telegram SaaS Platform</div>
+          <div class="featured-sub">Premium Content Infrastructure · 13 Subsystems · Production</div>
+        </div>
+        <div class="featured-badges">
+          <span class="badge badge-red">Production Grade</span>
+          <span class="badge badge-gray">Python · Pyrogram</span>
+          <span class="badge badge-gray">MongoDB · Redis</span>
+          <span class="badge badge-gray">13 Subsystems</span>
+        </div>
+      </div>
+
+      <div class="featured-body">
+        <div class="featured-desc">
+          <p style="margin-bottom: 16px;">
+            A complete Telegram content monetization platform built
+            around 5 core engineering principles: database is the
+            only source of truth, every operation is restart-safe,
+            every operation is idempotent, every operation is
+            audit-logged, and every operation is recoverable.
+          </p>
+          <p style="margin-bottom: 16px;">
+            The platform handles the full subscription lifecycle —
+            from payment verification through premium channel access,
+            content submission, anonymous routing, watermark
+            rendering, and vault distribution.
+          </p>
+          <p>
+            FloodWait protection, duplicate-safe processing, and
+            permanent per-user topic routing in a verification hub
+            ensure zero message loss even under Telegram API
+            rate limits.
+          </p>
+        </div>
+
+        <div class="featured-systems">
+          <div class="systems-title">Core Subsystems</div>
+          <ul class="system-list">
+            <li class="system-item">Premium Subscription System</li>
+            <li class="system-item">Payment Moderation System</li>
+            <li class="system-item">Verification Hub (Permanent User Topics)</li>
+            <li class="system-item">Support System (Topic-Based)</li>
+            <li class="system-item">Referral System</li>
+            <li class="system-item">User Dashboard</li>
+            <li class="system-item">Content Submission System</li>
+            <li class="system-item">Takedown Request System</li>
+            <li class="system-item">Vault Archive (Multi-Tier)</li>
+            <li class="system-item">Queue Distribution Engine</li>
+            <li class="system-item">Watermark Pipeline</li>
+            <li class="system-item">Audit &amp; Moderation System</li>
+            <li class="system-item">Trust &amp; Fraud System</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="container">
+    <div class="section-label reveal">04 — Architecture</div>
+    <h2 class="section-title reveal">How It's Built</h2>
+    <p class="section-desc reveal">
+      Event-driven, async, stateful. Every system I build follows
+      a message → queue → worker → delivery pattern with full
+      observability at each stage.
+    </p>
+
+    <div class="arch-diagram reveal" style="margin-bottom: 24px;">
+      <div style="font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 28px;">Content Distribution Pipeline</div>
+
+      <div style="display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px;">
+        <div class="arch-node accent-node">
+          <div class="arch-node-label">Source Channel</div>
+          <div class="arch-node-sub">Telegram MTProto</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-label">Message Listener</div>
+          <div class="arch-node-sub">Pyrogram Handler</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-label">Queue Manager</div>
+          <div class="arch-node-sub">3s Debounce</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-label">MongoDB</div>
+          <div class="arch-node-sub">Persistent Queue</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-label">Scheduler</div>
+          <div class="arch-node-sub">APScheduler</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node">
+          <div class="arch-node-label">Posting Worker</div>
+          <div class="arch-node-sub">Atomic Dequeue</div>
+        </div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-node accent-node">
+          <div class="arch-node-label">Target Channel</div>
+          <div class="arch-node-sub">No "Forwarded"</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;" class="reveal">
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="t-dot t-red"></span>
+          <span class="t-dot t-yellow"></span>
+          <span class="t-dot t-green"></span>
+          <span class="terminal-title">queue_states.py</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-line"><span class="t-comment"># Queue Item State Machine</span></div>
+          <div class="t-line"><span class="t-key">class</span> <span class="t-cmd">QueueStatus</span><span class="t-prompt">:</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-string">PENDING</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-comment"># Waiting</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-string">PROCESSING</span>&nbsp;<span class="t-comment"># Atomic lock</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-string">SENT</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-comment"># Delivered</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-string">FAILED</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-comment"># Permanent err</span></div>
+          <br/>
+          <div class="t-line"><span class="t-comment"># Transitions</span></div>
+          <div class="t-line"><span class="t-output">PENDING → PROCESSING</span></div>
+          <div class="t-line"><span class="t-output">PROCESSING → SENT</span></div>
+          <div class="t-line"><span class="t-output">PROCESSING → PENDING</span></div>
+          <div class="t-line"><span class="t-comment"># (FloodWait retry)</span></div>
+        </div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="t-dot t-red"></span>
+          <span class="t-dot t-yellow"></span>
+          <span class="t-dot t-green"></span>
+          <span class="terminal-title">recovery.py</span>
+        </div>
+        <div class="terminal-body">
+          <div class="t-line"><span class="t-comment"># Restart recovery on boot</span></div>
+          <div class="t-line"><span class="t-key">async def</span> <span class="t-cmd">recover_on_startup</span><span class="t-prompt">():</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-comment"># Reset stale locks</span></div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-key">await</span> db.queue.update_many(</div>
+          <div class="t-line">&nbsp;&nbsp;&nbsp;&nbsp;{<span class="t-string">"status"</span>: <span class="t-output">"PROCESSING"</span>},</div>
+          <div class="t-line">&nbsp;&nbsp;&nbsp;&nbsp;{<span class="t-string">"$set"</span>: {</div>
+          <div class="t-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-string">"status"</span>: <span class="t-output">"PENDING"</span></div>
+          <div class="t-line">&nbsp;&nbsp;&nbsp;&nbsp;}}</div>
+          <div class="t-line">&nbsp;&nbsp;)</div>
+          <div class="t-line">&nbsp;&nbsp;<span class="t-comment"># Zero data loss guarantee</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TELEGRAM INFRA -->
+<section id="telegram">
+  <div class="container">
+    <div class="section-label reveal">05 — Telegram Infrastructure</div>
+    <h2 class="section-title reveal">Core Capabilities</h2>
+    <p class="section-desc reveal">
+      Deep expertise across every layer of the Telegram platform —
+      from MTProto internals to UX flows that end-users trust.
+    </p>
+
+    <div class="tg-grid">
+      <div class="tg-card reveal">
+        <div class="tg-number">01</div>
+        <div class="tg-name">Pyrogram / MTProto</div>
+        <div class="tg-desc">Direct Telegram API via MTProto. Session management, media groups, inline keyboards, and full FloodWait backoff.</div>
+      </div>
+      <div class="tg-card reveal">
+        <div class="tg-number">02</div>
+        <div class="tg-name">Forum Topics as CRM</div>
+        <div class="tg-desc">Using Telegram's topic system as a permanent per-user thread. One topic per user, never duplicated, fully persistent.</div>
+      </div>
+      <div class="tg-card reveal">
+        <div class="tg-number">03</div>
+        <div class="tg-name">Payment Verification</div>
+        <div class="tg-desc">Manual and automated payment flows with screenshot verification, admin approval queues, and subscription lifecycle tracking.</div>
+      </div>
+      <div class="tg-card reveal">
+        <div class="tg-number">04</div>
+        <div class="tg-name">Content Pipeline</div>
+        <div class="tg-desc">Source-to-target copy without "Forwarded" metadata, media group buffering, caption injection, and daily limit enforcement.</div>
+      </div>
+      <div class="tg-card reveal">
+        <div class="tg-number">05</div>
+        <div class="tg-name">Anonymous Submission</div>
+        <div class="tg-desc">User content submission with identity stripping, moderation queues, admin approval, and takedown request handling.</div>
+      </div>
+      <div class="tg-card reveal">
+        <div class="tg-number">06</div>
+        <div class="tg-name">Anti-Fraud Systems</div>
+        <div class="tg-desc">Referral fraud detection, duplicate submission prevention, ban propagation, and permanent audit logs for every action.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STACK -->
+<section id="stack">
+  <div class="container">
+    <div class="section-label reveal">06 — Technology Stack</div>
+    <h2 class="section-title reveal">Tools &amp; Technologies</h2>
+    <p class="section-desc reveal">
+      The full stack I work with — from async Python backends
+      to React dashboards and cloud deployment pipelines.
+    </p>
+
+    <div class="stack-categories">
+      <div class="stack-group reveal">
+        <div class="stack-group-title">Backend</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="stack-name">Python</span><div class="stack-bar"><div class="stack-bar-fill" style="width:95%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Pyrogram</span><div class="stack-bar"><div class="stack-bar-fill" style="width:90%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">FastAPI</span><div class="stack-bar"><div class="stack-bar-fill" style="width:80%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Node.js</span><div class="stack-bar"><div class="stack-bar-fill" style="width:78%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Async/await</span><div class="stack-bar"><div class="stack-bar-fill" style="width:93%"></div></div></div>
+        </div>
+      </div>
+
+      <div class="stack-group reveal">
+        <div class="stack-group-title">Database</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="stack-name">MongoDB</span><div class="stack-bar"><div class="stack-bar-fill" style="width:92%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Redis</span><div class="stack-bar"><div class="stack-bar-fill" style="width:75%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Motor (Async)</span><div class="stack-bar"><div class="stack-bar-fill" style="width:88%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Mongoose</span><div class="stack-bar"><div class="stack-bar-fill" style="width:70%"></div></div></div>
+        </div>
+      </div>
+
+      <div class="stack-group reveal">
+        <div class="stack-group-title">Frontend</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="stack-name">React</span><div class="stack-bar"><div class="stack-bar-fill" style="width:82%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Next.js</span><div class="stack-bar"><div class="stack-bar-fill" style="width:74%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">TypeScript</span><div class="stack-bar"><div class="stack-bar-fill" style="width:78%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Tailwind CSS</span><div class="stack-bar"><div class="stack-bar-fill" style="width:85%"></div></div></div>
+        </div>
+      </div>
+
+      <div class="stack-group reveal">
+        <div class="stack-group-title">Infrastructure</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="stack-name">Railway</span><div class="stack-bar"><div class="stack-bar-fill" style="width:88%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Docker</span><div class="stack-bar"><div class="stack-bar-fill" style="width:70%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">Koyeb</span><div class="stack-bar"><div class="stack-bar-fill" style="width:75%"></div></div></div>
+          <div class="stack-item"><span class="stack-name">APScheduler</span><div class="stack-bar"><div class="stack-bar-fill" style="width:85%"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GITHUB ACTIVITY -->
+<section id="activity">
+  <div class="container">
+    <div class="section-label reveal">07 — Activity</div>
+    <h2 class="section-title reveal">Recent Work</h2>
+    <p class="section-desc reveal">
+      A snapshot of recent commits across active client projects
+      and personal infrastructure experiments.
+    </p>
+
+    <div class="activity-grid reveal">
+      <div class="card">
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px;">Recent Commits</div>
+        <div class="commit-list">
+          <div class="commit-item">
+            <span class="commit-hash">a3f7c1</span>
+            <div>
+              <div class="commit-msg">feat: add restart recovery for PROCESSING items</div>
+              <div class="commit-meta">contentvault · 2 days ago</div>
+            </div>
+          </div>
+          <div class="commit-item">
+            <span class="commit-hash">b9d2e5</span>
+            <div>
+              <div class="commit-msg">fix: FloodWait backoff with re-queue on 429</div>
+              <div class="commit-meta">contentvault · 3 days ago</div>
+            </div>
+          </div>
+          <div class="commit-item">
+            <span class="commit-hash">c1a8f3</span>
+            <div>
+              <div class="commit-msg">feat: AI FAQ handler with webhook registration</div>
+              <div class="commit-meta">commandrelay · 5 days ago</div>
+            </div>
+          </div>
+          <div class="commit-item">
+            <span class="commit-hash">d5b4a9</span>
+            <div>
+              <div class="commit-msg">refactor: connection pool size 4 → 8 workers</div>
+              <div class="commit-meta">commandrelay · 1 week ago</div>
+            </div>
+          </div>
+          <div class="commit-item">
+            <span class="commit-hash">e7c2b1</span>
+            <div>
+              <div class="commit-msg">feat: WebSocket log streaming with zustand store</div>
+              <div class="commit-meta">botorchestra · 1 week ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px;">Contribution Graph</div>
+        <div id="contrib-graph"></div>
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); display: flex; gap: 24px;">
+          <div>
+            <div style="font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--text);">342</div>
+            <div style="font-family: var(--sans); font-size: 11px; color: var(--text3);">Contributions this year</div>
+          </div>
+          <div>
+            <div style="font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--text);">7</div>
+            <div style="font-family: var(--sans); font-size: 11px; color: var(--text3);">Active projects</div>
+          </div>
+          <div>
+            <div style="font-family: var(--mono); font-size: 22px; font-weight: 600; color: var(--accent);">94%</div>
+            <div style="font-family: var(--sans); font-size: 11px; color: var(--text3);">Python/JS ratio</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label reveal">08 — Contact</div>
+    <h2 class="section-title reveal">Let's Build Something</h2>
+    <p class="section-desc reveal">
+      Available for Telegram bot projects, automation systems,
+      and backend infrastructure work. Response within 24 hours.
+    </p>
+
+    <div class="contact-inner reveal">
+      <div class="contact-links">
+        <a href="https://t.me/SH4D0WZ0N3" target="_blank" class="contact-link">
+          <div class="contact-link-icon">✈</div>
+          <div class="contact-link-info">
+            <div class="contact-link-label">TELEGRAM</div>
+            <div class="contact-link-value">@SH4D0WZ0N3</div>
+          </div>
+          <div class="contact-link-arrow">→</div>
+        </a>
+        <a href="mailto:sh4d0wz0n3@proton.me" class="contact-link">
+          <div class="contact-link-icon">✉</div>
+          <div class="contact-link-info">
+            <div class="contact-link-label">EMAIL</div>
+            <div class="contact-link-value">sh4d0wz0n3@proton.me</div>
+          </div>
+          <div class="contact-link-arrow">→</div>
+        </a>
+        <a href="https://github.com/SH4D0WZ0N3" target="_blank" class="contact-link">
+          <div class="contact-link-icon">⌥</div>
+          <div class="contact-link-info">
+            <div class="contact-link-label">GITHUB</div>
+            <div class="contact-link-value">github.com/SH4D0WZ0N3</div>
+          </div>
+          <div class="contact-link-arrow">→</div>
+        </a>
+      </div>
+
+      <div class="availability-card">
+        <div class="avail-status">
+          <div class="avail-dot"></div>
+          <div class="avail-text">Available for new projects</div>
+        </div>
+        <p class="avail-desc">
+          I take on a limited number of client projects at a time
+          to ensure quality and full attention to every system
+          I build. Reach out early — I'm often booked 2–3 weeks ahead.
+        </p>
+        <div class="avail-specialties">
+          <div class="specialty-item">Telegram Bot &amp; Platform Development</div>
+          <div class="specialty-item">Content Automation Infrastructure</div>
+          <div class="specialty-item">Admin Panel &amp; Dashboard Systems</div>
+          <div class="specialty-item">Multi-platform Messaging Bots</div>
+          <div class="specialty-item">Backend API &amp; Database Architecture</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">
+    © 2026 <span>Shuvro</span> — Backend &amp; Telegram Infrastructure Engineer
+  </div>
+  <ul class="footer-links">
+    <li><a href="#hero">Top</a></li>
+    <li><a href="#projects">Systems</a></li>
+    <li><a href="#featured">Featured</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</footer>
+
+<script>
+/* Contribution Graph */
+function generateContribGraph() {
+  const graph = document.getElementById('contrib-graph');
+  if (!graph) return;
+
+  const weeks = 18;
+  const days = 7;
+  const html = [];
+
+  for (let w = 0; w < weeks; w++) {
+    html.push('<div class="contrib-row">');
+    for (let d = 0; d < days; d++) {
+      const r = Math.random();
+      let cls = '';
+      if (r > 0.85) cls = 'l4';
+      else if (r > 0.65) cls = 'l3';
+      else if (r > 0.45) cls = 'l2';
+      else if (r > 0.3) cls = 'l1';
+      html.push(`<div class="contrib-cell ${cls}"></div>`);
+    }
+    html.push('</div>');
+  }
+
+  const container = document.createElement('div');
+  container.style.cssText = 'display:flex; gap:3px; flex-wrap:wrap;';
+  container.innerHTML = html.join('');
+  graph.appendChild(container);
+}
+
+generateContribGraph();
+
+/* Scroll reveal */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach((el, i) => {
+  el.style.transitionDelay = `${(i % 4) * 0.07}s`;
+  revealObserver.observe(el);
+});
+
+/* Nav active state */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.nav-links a');
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navLinks.forEach(link => {
+        link.style.color = link.getAttribute('href') === `#${id}`
+          ? 'var(--text)'
+          : 'var(--text2)';
+      });
+    }
+  });
+}, { threshold: 0.4 });
+
+sections.forEach(s => sectionObserver.observe(s));
+</script>
+</body>
+</html>
