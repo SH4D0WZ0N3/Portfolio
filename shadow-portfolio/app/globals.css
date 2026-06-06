@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #060608;
+  --acc: #c8102e;
+}
+
+html { scroll-behavior: smooth; overflow-x: hidden; }
+
+body {
+  background: #060608;
+  color: #f0f0f2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #060608; }
+::-webkit-scrollbar-thumb { background: #8b0000; border-radius: 2px; }
+::selection { background: #c8102e; color: #fff; }
