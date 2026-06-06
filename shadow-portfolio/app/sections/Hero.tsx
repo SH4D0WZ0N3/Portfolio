@@ -1,13 +1,7 @@
-"use client";
-import Image from "next/image";
-import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 
-const fadeUp = (delay: number) => ({
-  initial: { opacity: 0, y: 24 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.7, delay, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] },
-});
+"use client";
+import { useEffect, useRef } from "react";
+import { HERO_IMAGE_DATA } from "@/app/heroData";
 
 export default function Hero() {
   const bgRef = useRef<HTMLDivElement>(null);
@@ -15,7 +9,7 @@ export default function Hero() {
   useEffect(() => {
     const onScroll = () => {
       if (bgRef.current) {
-        bgRef.current.style.transform = `translateY(${window.scrollY * 0.22}px)`;
+        bgRef.current.style.transform = `translateY(${window.scrollY * 0.20}px)`;
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -25,149 +19,257 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen grid grid-cols-1 md:grid-cols-2 items-center pt-14 overflow-hidden"
+      style={{ minHeight: "100vh", position: "relative", overflow: "hidden", paddingTop: "56px" }}
     >
-      {/* LEFT */}
-      <div className="flex flex-col justify-center px-6 md:px-14 lg:px-20 py-20 md:py-0 relative z-10">
-        <motion.div {...fadeUp(0.1)} className="flex items-center gap-3 mb-7">
-          <span className="w-8 h-px bg-[#c8102e] opacity-60" />
-          <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-[#c8102e]">
-            Backend Systems &amp; Telegram Infrastructure
-          </span>
-        </motion.div>
+      {/* IMAGE RIGHT HALF */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0, right: 0,
+          width: "52%",
+          height: "100%",
+          overflow: "hidden",
+        }}
+      >
+        {/* Parallax image layer */}
+        <div
+          ref={bgRef}
+          style={{
+            position: "absolute",
+            inset: "-10% 0",
+            backgroundImage: `url(${HERO_IMAGE_DATA})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center top",
+            filter: "brightness(0.52) saturate(0.82)",
+            willChange: "transform",
+          }}
+        />
+        {/* Left vignette into bg */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to right, #060608 0%, rgba(6,6,8,0.65) 25%, transparent 55%)",
+          pointerEvents: "none",
+        }} />
+        {/* Bottom vignette */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to top, #060608 0%, transparent 30%)",
+          pointerEvents: "none",
+        }} />
+        {/* Top vignette */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(to bottom, rgba(6,6,8,0.45) 0%, transparent 18%)",
+          pointerEvents: "none",
+        }} />
+        {/* Red atmosphere glow */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none",
+          background: "radial-gradient(ellipse 55% 50% at 65% 38%, rgba(200,16,46,0.14) 0%, transparent 60%)",
+        }} />
+        {/* Cinematic frame */}
+        <div style={{
+          position: "absolute",
+          top: "clamp(28px,4%,52px)", right: "clamp(18px,3.5%,44px)",
+          bottom: "clamp(28px,4%,52px)", left: "clamp(18px,3.5%,44px)",
+          border: "1px solid rgba(200,16,46,0.18)",
+          borderRadius: "12px",
+          boxShadow: "inset 0 0 70px rgba(200,16,46,0.04), 0 0 0 1px rgba(255,255,255,0.025)",
+          pointerEvents: "none",
+        }}>
+          <span style={{
+            position: "absolute", top: -1, left: 32, right: 32, height: 1,
+            background: "linear-gradient(to right, transparent, rgba(200,16,46,0.65), transparent)",
+          }} />
+          <span style={{
+            position: "absolute", bottom: -1, left: 32, right: 32, height: 1,
+            background: "linear-gradient(to right, transparent, rgba(200,16,46,0.32), transparent)",
+          }} />
+          {/* Corner accents */}
+          {["top-0 left-0","top-0 right-0","bottom-0 left-0","bottom-0 right-0"].map((pos,i) => (
+            <span key={i} style={{
+              position: "absolute",
+              ...(pos.includes("top-0") ? { top: 8 } : { bottom: 8 }),
+              ...(pos.includes("left-0") ? { left: 8 } : { right: 8 }),
+              width: 16, height: 16,
+              borderTop: pos.includes("top-0") ? "1px solid rgba(200,16,46,0.5)" : "none",
+              borderBottom: pos.includes("bottom-0") ? "1px solid rgba(200,16,46,0.5)" : "none",
+              borderLeft: pos.includes("left-0") ? "1px solid rgba(200,16,46,0.5)" : "none",
+              borderRight: pos.includes("right-0") ? "1px solid rgba(200,16,46,0.5)" : "none",
+            }} />
+          ))}
+        </div>
+        {/* Scan line */}
+        <div
+          className="scan-anim"
+          style={{
+            position: "absolute", left: 0, right: 0, height: 1, pointerEvents: "none",
+            background: "linear-gradient(to right, transparent 0%, rgba(200,16,46,0.55) 50%, transparent 100%)",
+          }}
+        />
+        {/* Status badge */}
+        <div style={{
+          position: "absolute",
+          bottom: "clamp(36px,6%,64px)",
+          left: "clamp(28px,5%,56px)",
+          background: "rgba(6,6,8,0.9)",
+          backdropFilter: "blur(24px)",
+          border: "1px solid rgba(200,16,46,0.28)",
+          borderRadius: "8px",
+          padding: "14px 18px",
+          boxShadow: "0 8px 36px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03)",
+          pointerEvents: "none",
+        }}>
+          <div className="mono" style={{ display:"flex", alignItems:"center", gap:7, fontSize:11, color:"#f0f0f2", fontWeight:500, marginBottom:10 }}>
+            <span className="pulse-dot-fast" style={{ width:6, height:6, borderRadius:"50%", background:"#22c55e", boxShadow:"0 0 8px #22c55e", display:"inline-block" }} />
+            SYSTEM ONLINE
+          </div>
+          {[
+            { k:"LOCATION",     v:"Ontario, CA",     green:false },
+            { k:"SPECIALITY",   v:"Telegram Infra",  green:false },
+            { k:"AVAILABILITY", v:"OPEN",             green:true },
+          ].map(r => (
+            <div key={r.k} className="mono" style={{ display:"flex", gap:10, fontSize:10, color:"#444455", lineHeight:"1.9" }}>
+              <span style={{ minWidth:82 }}>{r.k}</span>
+              <span style={{ color: r.green ? "#22c55e" : "#c8102e" }}>{r.v}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-        <motion.h1
-          {...fadeUp(0.2)}
-          className="font-mono font-bold leading-[1.05] tracking-[-0.04em] mb-6"
-          style={{ fontSize: "clamp(32px,4.5vw,58px)" }}
-        >
-          Infrastructure<br />
-          <span className="text-[#c8102e]">That Operates</span><br />
-          <span className="text-[#444455]">In Silence.</span>
-        </motion.h1>
+      {/* LEFT CONTENT */}
+      <div style={{
+        position: "relative", zIndex: 10,
+        width: "55%",
+        minHeight: "calc(100vh - 56px)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        padding: "clamp(60px,8vw,100px) clamp(20px,5vw,80px) clamp(60px,8vw,100px) clamp(20px,5vw,80px)",
+      }}>
+        {/* Eyebrow */}
+        <div className="mono" style={{ display:"flex", alignItems:"center", gap:10, marginBottom:28, fontSize:11, letterSpacing:"0.2em", textTransform:"uppercase", color:"#c8102e" }}>
+          <span style={{ width:28, height:1, background:"#c8102e", opacity:0.6, display:"inline-block" }} />
+          Backend Systems &amp; Telegram Infrastructure
+        </div>
 
-        <motion.p
-          {...fadeUp(0.3)}
-          className="text-[#8a8a99] leading-[1.8] max-w-md mb-10"
-          style={{ fontSize: "clamp(14px,1.4vw,16px)" }}
+        {/* H1 */}
+        <h1
+          className="mono"
+          style={{
+            fontSize: "clamp(36px,4.8vw,64px)",
+            fontWeight: 700,
+            lineHeight: 1.04,
+            letterSpacing: "-0.04em",
+            marginBottom: 24,
+          }}
         >
+          Infrastructure<br/>
+          <span className="text-gradient-red">That Operates</span><br/>
+          <span style={{ color:"#444455" }}>In Silence.</span>
+        </h1>
+
+        {/* Sub */}
+        <p style={{
+          fontSize: "clamp(14px,1.35vw,16px)",
+          color: "#8a8a99",
+          lineHeight: 1.82,
+          maxWidth: 440,
+          marginBottom: 36,
+        }}>
           I design and build production-grade Telegram platforms,
           automation pipelines, and distributed backend systems —
           engineered for reliability, not just functionality.
           Based in Ontario, Canada.
-        </motion.p>
+        </p>
 
-        <motion.div {...fadeUp(0.35)} className="flex items-center gap-4 flex-wrap mb-10">
-          <span className="flex items-center gap-1.5 font-mono text-[11px] tracking-[0.06em] text-[#444455]">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <circle cx="5" cy="5" r="4" stroke="#c8102e" strokeWidth="1"/>
-              <circle cx="5" cy="5" r="2" fill="#c8102e"/>
-            </svg>
-            Ontario, Canada
-          </span>
-          <span className="text-[#2a2a38]">·</span>
-          <span className="flex items-center gap-1.5 font-mono text-[11px] tracking-[0.06em] text-[#444455]">
-            <span className="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_6px_#22c55e]" />
-            Available for Projects
-          </span>
-          <span className="text-[#2a2a38]">·</span>
-          <span className="font-mono text-[11px] tracking-[0.06em] text-[#444455]">MTProto Specialist</span>
-        </motion.div>
+        {/* Meta pills */}
+        <div style={{ display:"flex", flexWrap:"wrap", gap:10, marginBottom:38 }}>
+          {[
+            { dot:"#c8102e", text:"Ontario, Canada" },
+            { dot:"#22c55e", text:"Available for Projects" },
+            { dot:null,      text:"MTProto Specialist" },
+          ].map((m,i) => (
+            <span key={i} className="mono" style={{
+              display:"flex", alignItems:"center", gap:6,
+              fontSize:11, color:"#444455", letterSpacing:"0.06em",
+            }}>
+              {i > 0 && <span style={{ color:"#2a2a38", margin:"0 4px" }}>·</span>}
+              {m.dot && <span style={{ width:7, height:7, borderRadius:"50%", background:m.dot, boxShadow:`0 0 6px ${m.dot}`, display:"inline-block" }} />}
+              {m.text}
+            </span>
+          ))}
+        </div>
 
-        <motion.div {...fadeUp(0.4)} className="flex gap-3 flex-wrap mb-12">
+        {/* CTAs */}
+        <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:48 }}>
           <button
-            onClick={() => document.querySelector("#cases")?.scrollIntoView({ behavior: "smooth" })}
-            className="flex items-center gap-2 font-mono text-sm font-medium text-white bg-[#c8102e] px-6 py-3 rounded hover:bg-[#e0122f] transition-all duration-200 hover:-translate-y-px shadow-[0_0_24px_rgba(200,16,46,0.2)] hover:shadow-[0_4px_28px_rgba(200,16,46,0.35)]"
+            onClick={() => document.getElementById("cases")?.scrollIntoView({ behavior:"smooth" })}
+            className="mono"
+            style={{
+              fontSize:13, fontWeight:500, color:"#fff",
+              background:"#c8102e", border:"none",
+              padding:"13px 28px", borderRadius:"6px", cursor:"pointer",
+              boxShadow:"0 0 28px rgba(200,16,46,0.22), 0 2px 12px rgba(200,16,46,0.18)",
+              transition:"all 0.2s",
+            }}
+            onMouseEnter={e => { const b = e.currentTarget; b.style.background="#e0122f"; b.style.transform="translateY(-2px)"; b.style.boxShadow="0 6px 32px rgba(200,16,46,0.38)"; }}
+            onMouseLeave={e => { const b = e.currentTarget; b.style.background="#c8102e"; b.style.transform="translateY(0)"; b.style.boxShadow="0 0 28px rgba(200,16,46,0.22)"; }}
           >
             View Case Studies →
           </button>
           <button
-            onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" })}
-            className="flex items-center gap-2 font-mono text-sm text-[#f0f0f2] bg-[#111116] border border-white/10 px-6 py-3 rounded hover:bg-[#17171e] hover:border-white/20 transition-all duration-200 hover:-translate-y-px"
+            onClick={() => document.getElementById("contact")?.scrollIntoView({ behavior:"smooth" })}
+            className="mono"
+            style={{
+              fontSize:13, color:"#f0f0f2",
+              background:"#111116", border:"1px solid rgba(255,255,255,0.1)",
+              padding:"13px 28px", borderRadius:"6px", cursor:"pointer",
+              transition:"all 0.2s",
+            }}
+            onMouseEnter={e => { const b = e.currentTarget; b.style.background="#17171e"; b.style.borderColor="rgba(255,255,255,0.2)"; b.style.transform="translateY(-2px)"; }}
+            onMouseLeave={e => { const b = e.currentTarget; b.style.background="#111116"; b.style.borderColor="rgba(255,255,255,0.1)"; b.style.transform="translateY(0)"; }}
           >
             Get In Touch
           </button>
-        </motion.div>
+        </div>
 
-        <motion.div
-          {...fadeUp(0.45)}
-          className="flex gap-8 pt-10 border-t border-white/[0.06]"
-        >
+        {/* Stats */}
+        <div style={{
+          display:"flex", gap:36,
+          paddingTop:36,
+          borderTop:"1px solid rgba(255,255,255,0.06)",
+          flexWrap:"wrap",
+        }}>
           {[
-            { n: "7+", l: "Production Systems" },
-            { n: "13", l: "Subsystems in Largest Build" },
-            { n: "100%", l: "Async Architecture" },
-          ].map((s) => (
+            { n:"7", suffix:"+", l:"Production Systems" },
+            { n:"13", suffix:"", l:"Subsystems in Largest Build" },
+            { n:"100", suffix:"%", l:"Async Architecture" },
+          ].map(s => (
             <div key={s.l}>
-              <div className="font-mono text-[28px] font-bold text-[#f0f0f2] leading-none mb-1">
-                {s.n.endsWith("%") ? <>{s.n.slice(0,-1)}<span className="text-[#c8102e]">%</span></> :
-                 s.n.endsWith("+") ? <>{s.n.slice(0,-1)}<span className="text-[#c8102e]">+</span></> :
-                 s.n}
+              <div className="mono" style={{ fontSize:30, fontWeight:700, color:"#f0f0f2", lineHeight:1, marginBottom:5 }}>
+                {s.n}<span style={{ color:"#c8102e" }}>{s.suffix}</span>
               </div>
-              <div className="font-mono text-[10px] text-[#444455] tracking-[0.05em]">{s.l}</div>
-            </div>
-          ))}
-        </motion.div>
-      </div>
-
-      {/* RIGHT — IMAGE */}
-      <div className="relative h-full min-h-[500px] md:min-h-screen overflow-hidden order-first md:order-last">
-        <div ref={bgRef} className="absolute inset-0 will-change-transform">
-          <Image
-            src="/hero-artwork.png"
-            alt="SH4D0W — Backend Engineer"
-            fill
-            priority
-            className="object-cover object-top"
-            style={{ filter: "brightness(0.52) saturate(0.8)" }}
-          />
-        </div>
-
-        {/* Vignettes */}
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: "linear-gradient(to right,#060608 0%,transparent 32%),linear-gradient(to top,#060608 0%,transparent 22%),linear-gradient(to bottom,rgba(6,6,8,0.3) 0%,transparent 20%)",
-        }} />
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: "radial-gradient(ellipse 60% 50% at 60% 40%,rgba(200,16,46,0.12) 0%,transparent 60%)",
-        }} />
-
-        {/* Frame */}
-        <div className="absolute pointer-events-none rounded-xl" style={{
-          top:"clamp(30px,5%,60px)", right:"clamp(20px,4%,50px)",
-          bottom:"clamp(30px,5%,60px)", left:"clamp(20px,4%,50px)",
-          border:"1px solid rgba(200,16,46,0.18)",
-          boxShadow:"inset 0 0 60px rgba(200,16,46,0.04),0 0 0 1px rgba(255,255,255,0.03)",
-        }}>
-          <span className="absolute -top-px left-8 right-8 h-px" style={{ background:"linear-gradient(to right,transparent,rgba(200,16,46,0.6),transparent)" }} />
-          <span className="absolute -bottom-px left-8 right-8 h-px" style={{ background:"linear-gradient(to right,transparent,rgba(200,16,46,0.3),transparent)" }} />
-        </div>
-
-        {/* Scan line */}
-        <div className="absolute left-0 right-0 h-px pointer-events-none animate-[scan_4s_ease-in-out_infinite]" style={{
-          background:"linear-gradient(to right,transparent 0%,rgba(200,16,46,0.5) 50%,transparent 100%)",
-        }} />
-
-        {/* Status badge */}
-        <div className="absolute bottom-[8%] left-[7%] rounded p-3.5 pointer-events-none" style={{
-          background:"rgba(6,6,8,0.88)", backdropFilter:"blur(20px)",
-          border:"1px solid rgba(200,16,46,0.25)", boxShadow:"0 8px 32px rgba(0,0,0,0.5)",
-        }}>
-          <div className="flex items-center gap-2 font-mono text-[11px] text-[#f0f0f2] font-medium mb-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] shadow-[0_0_8px_#22c55e] animate-[pulse-dot_2s_ease_infinite]" />
-            SYSTEM ONLINE
-          </div>
-          {[
-            { k: "LOCATION", v: "Ontario, CA", green: false },
-            { k: "SPECIALITY", v: "Telegram Infra", green: false },
-            { k: "AVAILABILITY", v: "OPEN", green: true },
-          ].map((r) => (
-            <div key={r.k} className="flex gap-2.5 font-mono text-[10px] text-[#444455] leading-6">
-              <span className="min-w-[76px]">{r.k}</span>
-              <span className={r.green ? "text-[#22c55e]" : "text-[#c8102e]"}>{r.v}</span>
+              <div className="mono" style={{ fontSize:10, color:"#444455", letterSpacing:"0.05em" }}>{s.l}</div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Mobile: image behind full section */}
+      <style>{`
+        @media (max-width: 767px) {
+          #hero > div:first-child {
+            position: absolute !important;
+            width: 100% !important;
+            top: 0; left: 0; right: 0; bottom: 0;
+          }
+          #hero > div:last-child {
+            width: 100% !important;
+            padding: 80px 24px 60px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

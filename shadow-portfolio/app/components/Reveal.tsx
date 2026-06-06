@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef, ReactNode } from "react";
-import { motion, useInView, useAnimation } from "framer-motion";
 
 export default function Reveal({
   children,
@@ -11,30 +10,32 @@ export default function Reveal({
   delay?: number;
   className?: string;
 }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const controls = useAnimation();
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (inView) controls.start("visible");
-  }, [inView, controls]);
+    const el = ref.current;
+    if (!el) return;
+    el.classList.add("reveal-init");
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            el.classList.remove("reveal-init");
+            el.classList.add("reveal-done");
+          }, delay * 1000);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08, rootMargin: "0px 0px -40px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [delay]);
 
   return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={controls}
-      variants={{
-        hidden: { opacity: 0, y: 24 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.7, delay },
-        },
-      }}
-      className={className}
-    >
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }

@@ -1,66 +1,68 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
-const links = [
-  { href: "#build", label: "Build" },
-  { href: "#cases", label: "Cases" },
-  { href: "#philosophy", label: "Philosophy" },
-  { href: "#arch", label: "Architecture" },
-  { href: "#stack", label: "Stack" },
-  { href: "#contact", label: "Contact" },
+const LINKS = [
+  { href: "build", label: "Build" },
+  { href: "cases", label: "Cases" },
+  { href: "philosophy", label: "Philosophy" },
+  { href: "arch", label: "Architecture" },
+  { href: "stack", label: "Stack" },
+  { href: "contact", label: "Contact" },
 ];
 
+const scrollTo = (id: string) => {
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
 export default function Nav({ show }: { show: boolean }) {
-  const [active, setActive] = useState("");
+  const [active, setActive] = useState("hero");
 
   useEffect(() => {
     const handler = () => {
-      const sections = document.querySelectorAll("section[id]");
-      const scrollY = window.scrollY + 100;
-      sections.forEach((s) => {
-        const el = s as HTMLElement;
-        if (
-          el.offsetTop <= scrollY &&
-          el.offsetTop + el.offsetHeight > scrollY
-        ) {
-          setActive(el.id);
-        }
+      const y = window.scrollY + 120;
+      document.querySelectorAll<HTMLElement>("section[id]").forEach((s) => {
+        if (s.offsetTop <= y && s.offsetTop + s.offsetHeight > y) setActive(s.id);
       });
     };
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
 
-  const scrollTo = (href: string) => {
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: show ? 0 : -100 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-6 md:px-10 border-b border-white/[0.06]"
-      style={{ background: "rgba(6,6,8,0.8)", backdropFilter: "blur(20px)" }}
+    <nav
+      className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-6 md:px-10"
+      style={{
+        background: "rgba(6,6,8,0.82)",
+        backdropFilter: "blur(22px) saturate(1.4)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        transform: show ? "translateY(0)" : "translateY(-100%)",
+        transition: "transform 0.65s cubic-bezier(0.16,1,0.3,1)",
+      }}
     >
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-        className="flex items-center gap-2.5 font-mono text-sm font-semibold tracking-widest text-[#f0f0f2]"
+        className="flex items-center gap-2.5 mono text-sm font-semibold tracking-widest"
+        style={{ color: "#f0f0f2" }}
       >
-        <span className="w-2 h-2 rounded-full bg-[#c8102e] shadow-[0_0_10px_#c8102e] animate-[pulse-dot_2.5s_ease_infinite]" />
+        <span
+          className="pulse-dot"
+          style={{
+            width: 8, height: 8, borderRadius: "50%",
+            background: "#c8102e",
+            boxShadow: "0 0 12px #c8102e, 0 0 4px #c8102e",
+            display: "inline-block",
+          }}
+        />
         SH4D0W
       </button>
 
-      <ul className="hidden md:flex items-center gap-7">
-        {links.map((l) => (
+      <ul className="hidden md:flex items-center gap-7 list-none">
+        {LINKS.map((l) => (
           <li key={l.href}>
             <button
               onClick={() => scrollTo(l.href)}
-              className={`font-mono text-[11px] tracking-[0.08em] uppercase transition-colors duration-200 ${
-                active === l.href.slice(1) ? "text-[#f0f0f2]" : "text-[#444455] hover:text-[#8a8a99]"
-              }`}
+              className="mono text-[11px] tracking-[0.08em] uppercase transition-colors duration-200"
+              style={{ color: active === l.href ? "#f0f0f2" : "#444455" }}
             >
               {l.label}
             </button>
@@ -69,11 +71,26 @@ export default function Nav({ show }: { show: boolean }) {
       </ul>
 
       <button
-        onClick={() => scrollTo("#contact")}
-        className="font-mono text-xs tracking-[0.06em] text-[#c8102e] border border-[#c8102e]/40 px-5 py-2 rounded hover:border-[#c8102e] hover:bg-[#c8102e]/10 transition-all duration-200"
+        onClick={() => scrollTo("contact")}
+        className="mono text-[12px] tracking-[0.06em] transition-all duration-200"
+        style={{
+          color: "#c8102e",
+          border: "1px solid rgba(200,16,46,0.4)",
+          padding: "7px 18px",
+          borderRadius: "6px",
+          background: "rgba(200,16,46,0.06)",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background = "rgba(200,16,46,0.14)";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "#c8102e";
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.background = "rgba(200,16,46,0.06)";
+          (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(200,16,46,0.4)";
+        }}
       >
         Hire Me →
       </button>
-    </motion.nav>
+    </nav>
   );
 }

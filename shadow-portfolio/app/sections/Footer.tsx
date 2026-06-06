@@ -1,21 +1,31 @@
+"use client";
+
+const scrollTo = (id: string) =>
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
 export default function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] px-6 md:px-10 py-7 flex flex-wrap items-center justify-between gap-3 relative z-10">
-      <p className="font-mono text-[11px] text-[#444455]">
-        © 2026 <span className="text-[#c8102e]">SH4D0W</span> — Backend &amp; Telegram Infrastructure Engineer — Ontario, Canada
+    <footer style={{
+      borderTop:"1px solid rgba(255,255,255,0.06)",
+      padding:"26px clamp(20px,4vw,60px)",
+      display:"flex",flexWrap:"wrap",
+      alignItems:"center",justifyContent:"space-between",
+      gap:12, position:"relative", zIndex:10,
+    }}>
+      <p className="mono" style={{ fontSize:11,color:"#444455" }}>
+        © 2026 <span style={{ color:"#c8102e" }}>SH4D0W</span> — Backend &amp; Telegram Infrastructure Engineer — Ontario, Canada
       </p>
-      <ul className="flex gap-6 list-none">
-        {["Build", "Cases", "Architecture", "Contact"].map((item) => (
-          <li key={item}>
+      <ul style={{ display:"flex",gap:22,listStyle:"none" }}>
+        {[["build","Build"],["cases","Cases"],["arch","Architecture"],["contact","Contact"]].map(([id,label]) => (
+          <li key={id}>
             <button
-              onClick={() =>
-                document
-                  .querySelector(`#${item.toLowerCase()}`)
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-              className="font-mono text-[11px] text-[#444455] hover:text-[#8a8a99] uppercase tracking-[0.06em] transition-colors duration-200"
+              onClick={() => scrollTo(id)}
+              className="mono"
+              style={{ fontSize:11,color:"#444455",background:"none",border:"none",cursor:"pointer",letterSpacing:"0.06em",textTransform:"uppercase",transition:"color 0.2s" }}
+              onMouseEnter={e => (e.currentTarget as HTMLButtonElement).style.color="#8a8a99"}
+              onMouseLeave={e => (e.currentTarget as HTMLButtonElement).style.color="#444455"}
             >
-              {item}
+              {label}
             </button>
           </li>
         ))}

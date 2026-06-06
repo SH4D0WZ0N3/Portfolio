@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SH4D0W Portfolio — Next.js 15
 
-## Getting Started
+Premium portfolio for a Telegram Infrastructure & Backend Systems Engineer.
 
-First, run the development server:
+## Stack
+- **Next.js 16** (App Router, static export)
+- **TypeScript** — strict mode
+- **Tailwind CSS** — utility classes + custom CSS animations
+- **Geist** — font family (sans + mono)
+- **Framer Motion** — (available, used for architecture diagram)
+
+## Deploy to Vercel (2 steps)
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# 1. Push to GitHub
+git init && git add . && git commit -m "init" && git remote add origin YOUR_REPO && git push -u origin main
+
+# 2. Import at vercel.com → auto-detects Next.js → Deploy
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No extra config needed. Vercel detects Next.js automatically.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local Dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # production build
+```
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+├── layout.tsx          # Root layout, metadata, OG tags, favicon
+├── page.tsx            # Main page — intro + nav orchestration
+├── globals.css         # Tailwind + custom animations
+├── heroData.ts         # Hero artwork (embedded base64 — always loads)
+├── components/
+│   ├── BgLayers.tsx    # Grid, noise, radial glow, mouse glow
+│   ├── Intro.tsx       # Cinematic boot sequence overlay
+│   ├── Nav.tsx         # Fixed nav with active section tracking
+│   ├── Reveal.tsx      # Intersection Observer scroll animations
+│   └── SectionLabel.tsx
+└── sections/
+    ├── Hero.tsx        # Split layout: text left, artwork right + parallax
+    ├── Build.tsx       # 6 service cards in premium grid
+    ├── Cases.tsx       # 3 full case studies + 3 compact cards
+    ├── Philosophy.tsx  # 6 infrastructure principles
+    ├── Architecture.tsx # Animated pipeline diagram + code terminals
+    ├── Stack.tsx       # 6 tech groups with gradient bars
+    ├── Process.tsx     # 5-step horizontal process
+    ├── Contact.tsx     # Links + availability card
+    └── Footer.tsx
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+public/
+├── hero-artwork.png    # Source artwork
+└── favicon.svg         # Crimson lightning bolt favicon
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Key Design Decisions
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Hero image embedded as base64** in `heroData.ts` — guarantees it loads on any Vercel/CDN setup without `next/image` domain config
+- **CSS-only animations** for scan line, dot pulse, and reveals — no runtime overhead
+- **Animated dashed arch lines** using `requestAnimationFrame` background-position trick
+- **No external image dependencies** — fully self-contained

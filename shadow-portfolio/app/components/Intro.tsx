@@ -1,60 +1,79 @@
 "use client";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
-const lines = [
-  { text: "SHADOW CORE v2.5.1", accent: false, delay: 0.2 },
-  { text: "SYSTEM: INITIALIZING", accent: false, delay: 0.7 },
-  { text: "BUILDING INFRASTRUCTURE IN SILENCE", accent: true, delay: 1.3 },
-  { text: "Ontario, Canada — STATUS: OPERATIONAL", accent: false, delay: 2.0 },
+const LINES = [
+  { text: "SHADOW CORE v2.5.1", accent: false, delay: 220 },
+  { text: "SYSTEM: INITIALIZING", accent: false, delay: 680 },
+  { text: "BUILDING INFRASTRUCTURE IN SILENCE", accent: true, delay: 1250 },
+  { text: "Ontario, Canada — STATUS: OPERATIONAL", accent: false, delay: 1950 },
 ];
 
 export default function Intro({ onDone }: { onDone: () => void }) {
-  const [visible, setVisible] = useState(true);
+  const [shown, setShown] = useState<number[]>([]);
+  const [bar1, setBar1] = useState(false);
+  const [bar2, setBar2] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      setVisible(false);
-      setTimeout(onDone, 800);
-    }, 3200);
-    return () => clearTimeout(t);
+    LINES.forEach((l, i) => {
+      setTimeout(() => setShown((p) => [...p, i]), l.delay);
+    });
+    setTimeout(() => setBar1(true), 550);
+    setTimeout(() => setBar2(true), 1800);
+    setTimeout(() => setExiting(true), 3100);
+    setTimeout(() => { setGone(true); onDone(); }, 3900);
   }, [onDone]);
 
+  if (gone) return null;
+
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          className="fixed inset-0 z-[9999] bg-[#060608] flex flex-col items-center justify-center gap-5"
-          aria-live="polite"
+    <div
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-5"
+      style={{
+        background: "#060608",
+        opacity: exiting ? 0 : 1,
+        transition: "opacity 0.8s ease",
+        pointerEvents: exiting ? "none" : "all",
+      }}
+    >
+      {LINES.map((l, i) => (
+        <p
+          key={i}
+          className="mono text-[12px] tracking-[0.22em] uppercase"
+          style={{
+            color: l.accent ? "#c8102e" : "#444455",
+            fontWeight: l.accent ? 500 : 400,
+            opacity: shown.includes(i) ? 1 : 0,
+            transform: shown.includes(i) ? "translateY(0)" : "translateY(10px)",
+            transition: "opacity 0.55s ease, transform 0.55s ease",
+          }}
         >
-          {lines.map((line, i) => (
-            <motion.p
-              key={i}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: line.delay, duration: 0.5 }}
-              className={`font-mono text-xs tracking-[0.2em] uppercase ${
-                line.accent ? "text-[#c8102e] font-medium" : "text-[#444455]"
-              }`}
-            >
-              {line.text}
-            </motion.p>
-          ))}
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="w-48 h-px origin-left"
-            style={{
-              background:
-                "linear-gradient(to right,transparent,#c8102e,transparent)",
-            }}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+          {l.text}
+        </p>
+      ))}
+      <div
+        style={{
+          width: "200px", height: "1px",
+          background: "linear-gradient(to right,transparent,#c8102e,transparent)",
+          opacity: bar1 ? 1 : 0,
+          transform: bar1 ? "scaleX(1)" : "scaleX(0)",
+          transformOrigin: "left",
+          transition: "opacity 0.6s ease, transform 0.6s ease",
+          position: "absolute",
+          top: "calc(50% - 40px)",
+        }}
+      />
+      <div
+        style={{
+          width: "120px", height: "1px",
+          background: "linear-gradient(to right,transparent,rgba(200,16,46,0.4),transparent)",
+          opacity: bar2 ? 1 : 0,
+          transition: "opacity 0.6s ease",
+          position: "absolute",
+          top: "calc(50% + 40px)",
+        }}
+      />
+    </div>
   );
 }

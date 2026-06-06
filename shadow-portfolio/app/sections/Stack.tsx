@@ -1,97 +1,48 @@
 import Reveal from "@/app/components/Reveal";
 import SectionLabel from "@/app/components/SectionLabel";
 
-const groups = [
-  {
-    title: "Core Languages",
-    items: [
-      { name: "Python", pct: 95 },
-      { name: "TypeScript", pct: 78 },
-      { name: "JavaScript", pct: 80 },
-      { name: "Bash", pct: 70 },
-    ],
-  },
-  {
-    title: "Telegram / MTProto",
-    items: [
-      { name: "Pyrogram", pct: 94 },
-      { name: "python-telegram-bot", pct: 88 },
-      { name: "Telethon", pct: 72 },
-      { name: "MTProto Layer", pct: 85 },
-    ],
-  },
-  {
-    title: "Backend",
-    items: [
-      { name: "FastAPI", pct: 82 },
-      { name: "Node.js", pct: 79 },
-      { name: "Async Python", pct: 93 },
-      { name: "APScheduler", pct: 88 },
-    ],
-  },
-  {
-    title: "Database",
-    items: [
-      { name: "MongoDB", pct: 93 },
-      { name: "Motor (Async)", pct: 90 },
-      { name: "Redis", pct: 76 },
-      { name: "Mongoose", pct: 72 },
-    ],
-  },
-  {
-    title: "Frontend",
-    items: [
-      { name: "React", pct: 83 },
-      { name: "Next.js", pct: 76 },
-      { name: "Tailwind CSS", pct: 87 },
-      { name: "Vite", pct: 80 },
-    ],
-  },
-  {
-    title: "Infrastructure",
-    items: [
-      { name: "Railway", pct: 90 },
-      { name: "Docker", pct: 74 },
-      { name: "Koyeb / Heroku", pct: 78 },
-      { name: "Loguru", pct: 86 },
-    ],
-  },
+const GROUPS = [
+  { title:"Core Languages",    items:[{n:"Python",p:95},{n:"TypeScript",p:78},{n:"JavaScript",p:80},{n:"Bash",p:70}] },
+  { title:"Telegram / MTProto",items:[{n:"Pyrogram",p:94},{n:"python-telegram-bot",p:88},{n:"Telethon",p:72},{n:"MTProto Layer",p:85}] },
+  { title:"Backend",           items:[{n:"FastAPI",p:82},{n:"Node.js",p:79},{n:"Async Python",p:93},{n:"APScheduler",p:88}] },
+  { title:"Database",          items:[{n:"MongoDB",p:93},{n:"Motor (Async)",p:90},{n:"Redis",p:76},{n:"Mongoose",p:72}] },
+  { title:"Frontend",          items:[{n:"React",p:83},{n:"Next.js",p:76},{n:"Tailwind CSS",p:87},{n:"Vite",p:80}] },
+  { title:"Infrastructure",    items:[{n:"Railway",p:90},{n:"Docker",p:74},{n:"Koyeb / Heroku",p:78},{n:"Loguru",p:86}] },
 ];
 
 export default function Stack() {
   return (
-    <section id="stack" className="py-28 border-t border-white/[0.06]">
-      <div className="max-w-6xl mx-auto px-6 md:px-10">
+    <section id="stack" style={{ padding:"clamp(80px,10vw,120px) 0", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 clamp(20px,4vw,60px)" }}>
         <Reveal><SectionLabel>05 — Technology Stack</SectionLabel></Reveal>
         <Reveal delay={0.05}>
-          <h2 className="font-mono font-bold tracking-tight text-[#f0f0f2] mb-4"
-            style={{ fontSize: "clamp(24px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
+          <h2 className="mono" style={{ fontSize:"clamp(26px,3.5vw,42px)",fontWeight:700,letterSpacing:"-0.03em",lineHeight:1.08,color:"#f0f0f2",marginBottom:14 }}>
             Tools of the Trade.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="text-[#8a8a99] text-[15px] leading-[1.75] max-w-xl mb-14">
-            The complete technical stack across all client projects — chosen for
-            reliability and production track record, not trends.
+          <p style={{ fontSize:15,color:"#8a8a99",lineHeight:1.78,maxWidth:520,marginBottom:56 }}>
+            The complete stack across all client projects — chosen for reliability
+            and production track record, not trends.
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {groups.map((g, gi) => (
-            <Reveal key={g.title} delay={gi * 0.05}>
-              <div className="bg-[#0b0b0e] border border-white/[0.06] rounded-xl p-6 h-full">
-                <div className="font-mono text-[10px] tracking-[0.12em] uppercase text-[#444455] mb-4 pb-3 border-b border-white/[0.06]">
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))", gap:16 }}>
+          {GROUPS.map((g,gi) => (
+            <Reveal key={g.title} delay={gi*0.05}>
+              <div
+                className="card-hover"
+                style={{ background:"#0b0b0e",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,padding:"24px",height:"100%" }}
+              >
+                <div className="mono" style={{ fontSize:10,letterSpacing:"0.12em",textTransform:"uppercase",color:"#444455",marginBottom:16,paddingBottom:12,borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
                   {g.title}
                 </div>
-                <div className="flex flex-col gap-3">
-                  {g.items.map((item) => (
-                    <div key={item.name} className="flex items-center justify-between gap-3">
-                      <span className="font-mono text-[12px] text-[#f0f0f2]">{item.name}</span>
-                      <div className="w-14 h-0.5 bg-[#1e1e28] rounded-full overflow-hidden flex-shrink-0">
-                        <div
-                          className="h-full bg-[#c8102e] rounded-full"
-                          style={{ width: `${item.pct}%` }}
-                        />
+                <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
+                  {g.items.map(item => (
+                    <div key={item.n} style={{ display:"flex",alignItems:"center",justifyContent:"space-between",gap:10 }}>
+                      <span className="mono" style={{ fontSize:12,color:"#f0f0f2" }}>{item.n}</span>
+                      <div style={{ width:56,height:2,background:"#1e1e28",borderRadius:1,overflow:"hidden",flexShrink:0 }}>
+                        <div style={{ width:`${item.p}%`,height:"100%",background:"linear-gradient(to right,#8b0000,#c8102e)",borderRadius:1 }} />
                       </div>
                     </div>
                   ))}

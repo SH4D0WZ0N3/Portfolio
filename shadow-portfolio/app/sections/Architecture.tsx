@@ -1,44 +1,73 @@
 "use client";
 import Reveal from "@/app/components/Reveal";
 import SectionLabel from "@/app/components/SectionLabel";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
-const pipelineNodes = [
-  { label: "Source Channel", sub: "MTProto", accent: true },
-  { label: "Msg Listener", sub: "Pyrogram" },
-  { label: "Queue Manager", sub: "3s debounce" },
-  { label: "MongoDB", sub: "Persistent queue" },
-  { label: "Scheduler", sub: "APScheduler" },
-  { label: "Posting Worker", sub: "Atomic dequeue" },
-  { label: "Target Channel", sub: "No Forwarded", accent: true },
+const NODES = [
+  { label:"Source Channel", sub:"MTProto", acc:true },
+  { label:"Msg Listener",   sub:"Pyrogram" },
+  { label:"Queue Manager",  sub:"3s debounce" },
+  { label:"MongoDB",        sub:"Persistent queue" },
+  { label:"Scheduler",      sub:"APScheduler" },
+  { label:"Posting Worker", sub:"Atomic dequeue" },
+  { label:"Target Channel", sub:"No Forwarded", acc:true },
 ];
 
-const NodeBox = ({ label, sub, accent }: { label: string; sub: string; accent?: boolean }) => (
-  <div
-    className={`flex-shrink-0 rounded px-3.5 py-2.5 text-center min-w-[100px] border transition-all duration-200 hover:-translate-y-0.5 ${
-      accent
-        ? "border-[rgba(200,16,46,0.35)] bg-[rgba(200,16,46,0.06)]"
-        : "border-white/10 bg-[#17171e] hover:border-white/20"
-    }`}
-  >
-    <div className={`font-mono text-[11px] font-semibold mb-0.5 ${accent ? "text-[#c8102e]" : "text-[#f0f0f2]"}`}>{label}</div>
-    <div className="font-mono text-[9px] text-[#444455]">{sub}</div>
-  </div>
-);
+function ArchNode({ label, sub, acc }: { label:string; sub:string; acc?:boolean }) {
+  const base: React.CSSProperties = {
+    flexShrink:0, borderRadius:6, padding:"11px 14px", textAlign:"center",
+    minWidth:100, border:"1px solid", transition:"all 0.2s", cursor:"default",
+  };
+  const s: React.CSSProperties = acc
+    ? { ...base, borderColor:"rgba(200,16,46,0.38)", background:"rgba(200,16,46,0.07)" }
+    : { ...base, borderColor:"rgba(255,255,255,0.1)", background:"#17171e" };
+  return (
+    <div style={s}
+      onMouseEnter={e => { const d=e.currentTarget; d.style.transform="translateY(-3px)"; d.style.boxShadow="0 8px 24px rgba(0,0,0,0.4)"; }}
+      onMouseLeave={e => { const d=e.currentTarget; d.style.transform="translateY(0)"; d.style.boxShadow="none"; }}
+    >
+      <div className="mono" style={{ fontSize:11,fontWeight:600,color:acc?"#c8102e":"#f0f0f2",marginBottom:3 }}>{label}</div>
+      <div className="mono" style={{ fontSize:9,color:"#444455" }}>{sub}</div>
+    </div>
+  );
+}
+
+// Animated connection line
+function ConnLine() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    let p = 0;
+    const tick = () => {
+      p = (p + 0.8) % 100;
+      el.style.backgroundPosition = `${p}% 0`;
+      requestAnimationFrame(tick);
+    };
+    const raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <div ref={ref} style={{
+      flexShrink:0, width:20, height:2, margin:"0 3px",
+      backgroundImage:"repeating-linear-gradient(90deg,#c8102e 0px,#c8102e 6px,transparent 6px,transparent 12px)",
+      backgroundSize:"24px 2px",
+      opacity:0.55,
+    }} />
+  );
+}
 
 export default function Architecture() {
   return (
-    <section id="arch" className="py-28 border-t border-white/[0.06]">
-      <div className="max-w-6xl mx-auto px-6 md:px-10">
+    <section id="arch" style={{ padding:"clamp(80px,10vw,120px) 0", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 clamp(20px,4vw,60px)" }}>
         <Reveal><SectionLabel>04 — Architecture</SectionLabel></Reveal>
         <Reveal delay={0.05}>
-          <h2 className="font-mono font-bold tracking-tight text-[#f0f0f2] mb-4"
-            style={{ fontSize: "clamp(24px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
-            How It's Built.
+          <h2 className="mono" style={{ fontSize:"clamp(26px,3.5vw,42px)",fontWeight:700,letterSpacing:"-0.03em",lineHeight:1.08,color:"#f0f0f2",marginBottom:14 }}>
+            How It&apos;s Built.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="text-[#8a8a99] text-[15px] leading-[1.75] max-w-xl mb-14">
+          <p style={{ fontSize:15,color:"#8a8a99",lineHeight:1.78,maxWidth:520,marginBottom:56 }}>
             Every platform follows a strict message → queue → worker → delivery
             pattern with full observability at each stage.
           </p>
@@ -46,36 +75,19 @@ export default function Architecture() {
 
         {/* Pipeline diagram */}
         <Reveal>
-          <div className="bg-[#0b0b0e] border border-white/[0.06] rounded-xl overflow-hidden mb-5">
-            <div className="flex items-center gap-2 px-5 py-3 bg-[#111116] border-b border-white/[0.06]">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-              <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-              <span className="font-mono text-[11px] text-[#444455] ml-2 tracking-[0.05em]">content-distribution-pipeline.arch</span>
+          <div style={{ background:"#0b0b0e",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,overflow:"hidden",marginBottom:20 }}>
+            <div style={{ display:"flex",alignItems:"center",gap:6,padding:"10px 18px",background:"#111116",borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <span style={{ width:11,height:11,borderRadius:"50%",background:"#ff5f57",display:"inline-block" }} />
+              <span style={{ width:11,height:11,borderRadius:"50%",background:"#febc2e",display:"inline-block" }} />
+              <span style={{ width:11,height:11,borderRadius:"50%",background:"#28c840",display:"inline-block" }} />
+              <span className="mono" style={{ fontSize:11,color:"#444455",marginLeft:8,letterSpacing:"0.05em" }}>content-distribution-pipeline.arch</span>
             </div>
-            <div className="p-8 overflow-x-auto">
-              <div className="flex items-center justify-center gap-0 min-w-[620px]">
-                {pipelineNodes.map((node, i) => (
-                  <div key={node.label} className="flex items-center">
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.08, duration: 0.5, ease: "easeOut" as const }}
-                    >
-                      <NodeBox {...node} />
-                    </motion.div>
-                    {i < pipelineNodes.length - 1 && (
-                      <motion.span
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.08 + 0.1 }}
-                        className="font-mono text-sm text-[#444455] px-1.5 flex-shrink-0"
-                      >
-                        →
-                      </motion.span>
-                    )}
+            <div style={{ padding:"clamp(24px,4%,44px)",overflowX:"auto" }}>
+              <div style={{ display:"flex",alignItems:"center",justifyContent:"center",minWidth:640,flexWrap:"nowrap" }}>
+                {NODES.map((n,i) => (
+                  <div key={n.label} style={{ display:"flex",alignItems:"center" }}>
+                    <ArchNode {...n} />
+                    {i < NODES.length-1 && <ConnLine />}
                   </div>
                 ))}
               </div>
@@ -84,51 +96,51 @@ export default function Architecture() {
         </Reveal>
 
         {/* Code terminals */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div style={{ display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:16 }}>
           <Reveal delay={0.05}>
-            <div className="bg-[#08080f] border border-white/[0.06] rounded-xl overflow-hidden font-mono text-[12px]">
-              <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#111116] border-b border-white/[0.06]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-                <span className="font-mono text-[10px] text-[#444455] ml-2">queue_fsm.py</span>
+            <div style={{ background:"#08080f",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,overflow:"hidden" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:6,padding:"10px 16px",background:"#111116",borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                <span style={{ width:10,height:10,borderRadius:"50%",background:"#ff5f57",display:"inline-block" }} />
+                <span style={{ width:10,height:10,borderRadius:"50%",background:"#febc2e",display:"inline-block" }} />
+                <span style={{ width:10,height:10,borderRadius:"50%",background:"#28c840",display:"inline-block" }} />
+                <span className="mono" style={{ fontSize:10,color:"#444455",marginLeft:8 }}>queue_fsm.py</span>
               </div>
-              <div className="p-5 leading-[1.9] space-y-0">
-                <p><span className="text-[#444455]"># State Machine</span></p>
-                <p><span className="text-[#61afef]">class</span> <span className="text-[#f0f0f2]">QueueStatus</span><span className="text-[#c8102e]">:</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#e5c07b]">PENDING</span>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#444455]"># waiting</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#e5c07b]">PROCESSING</span>&nbsp;<span className="text-[#444455]"># atomic lock</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#e5c07b]">SENT</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#444455]"># delivered</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#e5c07b]">FAILED</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#444455]"># permanent</span></p>
-                <p>&nbsp;</p>
-                <p><span className="text-[#444455]"># Transitions</span></p>
-                <p><span className="text-[#22c55e]">PENDING → PROCESSING</span></p>
-                <p><span className="text-[#22c55e]">PROCESSING → SENT</span></p>
-                <p><span className="text-[#22c55e]">PROCESSING → PENDING</span></p>
-                <p><span className="text-[#444455]">&nbsp;&nbsp;# FloodWait retry</span></p>
+              <div className="mono" style={{ padding:"20px 22px",fontSize:12,lineHeight:"1.9" }}>
+                <p style={{ color:"#444455" }}># State Machine</p>
+                <p><span style={{ color:"#61afef" }}>class</span> <span style={{ color:"#f0f0f2" }}>QueueStatus</span><span style={{ color:"#c8102e" }}>:</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#e5c07b" }}>PENDING</span>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#444455" }}># waiting</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#e5c07b" }}>PROCESSING</span>&nbsp;<span style={{ color:"#444455" }}># atomic lock</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#e5c07b" }}>SENT</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#444455" }}># delivered</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#e5c07b" }}>FAILED</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#444455" }}># permanent</span></p>
+                <br/>
+                <p style={{ color:"#444455" }}># Transitions</p>
+                <p><span style={{ color:"#22c55e" }}>PENDING → PROCESSING</span></p>
+                <p><span style={{ color:"#22c55e" }}>PROCESSING → SENT</span></p>
+                <p><span style={{ color:"#22c55e" }}>PROCESSING → PENDING</span></p>
+                <p style={{ color:"#444455" }}>&nbsp;&nbsp;# FloodWait retry</p>
               </div>
             </div>
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div className="bg-[#08080f] border border-white/[0.06] rounded-xl overflow-hidden font-mono text-[12px]">
-              <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#111116] border-b border-white/[0.06]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#ff5f57]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#febc2e]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#28c840]" />
-                <span className="font-mono text-[10px] text-[#444455] ml-2">startup_recovery.py</span>
+            <div style={{ background:"#08080f",border:"1px solid rgba(255,255,255,0.06)",borderRadius:14,overflow:"hidden" }}>
+              <div style={{ display:"flex",alignItems:"center",gap:6,padding:"10px 16px",background:"#111116",borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                <span style={{ width:10,height:10,borderRadius:"50%",background:"#ff5f57",display:"inline-block" }} />
+                <span style={{ width:10,height:10,borderRadius:"50%",background:"#febc2e",display:"inline-block" }} />
+                <span style={{ width:10,height:10,borderRadius:"50%",background:"#28c840",display:"inline-block" }} />
+                <span className="mono" style={{ fontSize:10,color:"#444455",marginLeft:8 }}>startup_recovery.py</span>
               </div>
-              <div className="p-5 leading-[1.9]">
-                <p><span className="text-[#444455]"># Zero data loss on restart</span></p>
-                <p><span className="text-[#61afef]">async def</span> <span className="text-[#f0f0f2]">recover_on_startup</span><span className="text-[#c8102e]">():</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#444455]"># Reset stale locks</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#61afef]">await</span> <span className="text-[#f0f0f2]">db.queue.update_many(</span></p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#f0f0f2]">{"{"}</span><span className="text-[#e5c07b]">"status"</span><span className="text-[#f0f0f2]">:</span> <span className="text-[#22c55e]">"PROCESSING"</span><span className="text-[#f0f0f2]">{"}"}</span><span className="text-[#f0f0f2]">,</span></p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#f0f0f2]">{"{"}</span><span className="text-[#e5c07b]">"$set"</span><span className="text-[#f0f0f2]">:</span> <span className="text-[#f0f0f2]">{"{"}</span></p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#e5c07b]">"status"</span><span className="text-[#f0f0f2]">:</span> <span className="text-[#22c55e]">"PENDING"</span></p>
-                <p>&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#f0f0f2]">{"}"}{"}"}</span></p>
-                <p>&nbsp;&nbsp;<span className="text-[#f0f0f2]">)</span></p>
-                <p><span className="text-[#444455]"># Runs automatically on every boot</span></p>
+              <div className="mono" style={{ padding:"20px 22px",fontSize:12,lineHeight:"1.9" }}>
+                <p style={{ color:"#444455" }}># Zero data loss on restart</p>
+                <p><span style={{ color:"#61afef" }}>async def</span> <span style={{ color:"#f0f0f2" }}>recover_on_startup</span><span style={{ color:"#c8102e" }}>();</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#444455" }}># Reset stale locks</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#61afef" }}>await</span> <span style={{ color:"#f0f0f2" }}>db.queue.update_many(</span></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#f0f0f2" }}>{"{"}</span><span style={{ color:"#e5c07b" }}>&quot;status&quot;</span><span style={{ color:"#f0f0f2" }}>: </span><span style={{ color:"#22c55e" }}>&quot;PROCESSING&quot;</span><span style={{ color:"#f0f0f2" }}>{"},"}</span></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#f0f0f2" }}>{"{"}</span><span style={{ color:"#e5c07b" }}>&quot;$set&quot;</span><span style={{ color:"#f0f0f2" }}>: {"{"}</span></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#e5c07b" }}>&quot;status&quot;</span><span style={{ color:"#f0f0f2" }}>: </span><span style={{ color:"#22c55e" }}>&quot;PENDING&quot;</span></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;<span style={{ color:"#f0f0f2" }}>{"}}"}</span></p>
+                <p>&nbsp;&nbsp;<span style={{ color:"#f0f0f2" }}>)</span></p>
+                <p style={{ color:"#444455" }}># Runs on every boot automatically</p>
               </div>
             </div>
           </Reveal>

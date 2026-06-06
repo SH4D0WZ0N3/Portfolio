@@ -1,13 +1,13 @@
 import Reveal from "@/app/components/Reveal";
 import SectionLabel from "@/app/components/SectionLabel";
 
-const links = [
-  { icon: "✈", label: "TELEGRAM — Preferred", value: "@SH4D0WZ0N3", href: "https://t.me/SH4D0WZ0N3" },
-  { icon: "✉", label: "EMAIL — Encrypted", value: "sh4d0wz0n3@proton.me", href: "mailto:sh4d0wz0n3@proton.me" },
-  { icon: "⌥", label: "GITHUB", value: "github.com/SH4D0WZ0N3", href: "https://github.com/SH4D0WZ0N3" },
+const LINKS = [
+  { icon:"✈", label:"TELEGRAM — Preferred", value:"@SH4D0WZ0N3", href:"https://t.me/SH4D0WZ0N3" },
+  { icon:"✉", label:"EMAIL — Encrypted",    value:"sh4d0wz0n3@proton.me", href:"mailto:sh4d0wz0n3@proton.me" },
+  { icon:"⌥", label:"GITHUB",               value:"github.com/SH4D0WZ0N3", href:"https://github.com/SH4D0WZ0N3" },
 ];
 
-const specialties = [
+const SPECS = [
   "Telegram Bot & SaaS Platforms",
   "Content Automation Infrastructure",
   "Admin Dashboards & Control Panels",
@@ -17,69 +17,90 @@ const specialties = [
 
 export default function Contact() {
   return (
-    <section id="contact" className="py-28 border-t border-white/[0.06]">
-      <div className="max-w-6xl mx-auto px-6 md:px-10">
+    <section id="contact" style={{ padding:"clamp(80px,10vw,120px) 0", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+      <div style={{ maxWidth:1100, margin:"0 auto", padding:"0 clamp(20px,4vw,60px)" }}>
         <Reveal><SectionLabel>07 — Contact</SectionLabel></Reveal>
         <Reveal delay={0.05}>
-          <h2 className="font-mono font-bold tracking-tight text-[#f0f0f2] mb-4"
-            style={{ fontSize: "clamp(24px,3.5vw,40px)", lineHeight: 1.1, letterSpacing: "-0.03em" }}>
-            Let's Build<br />Something Serious.
+          <h2 className="mono" style={{ fontSize:"clamp(26px,3.5vw,42px)",fontWeight:700,letterSpacing:"-0.03em",lineHeight:1.08,color:"#f0f0f2",marginBottom:14 }}>
+            Let&apos;s Build<br/>Something Serious.
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="text-[#8a8a99] text-[15px] leading-[1.75] max-w-xl mb-14">
-            I take on a limited number of projects at a time. If you need a
-            Telegram platform, automation system, or backend architecture
-            built right — reach out.
+          <p style={{ fontSize:15,color:"#8a8a99",lineHeight:1.78,maxWidth:520,marginBottom:56 }}>
+            I take on a limited number of projects at a time. If you need a Telegram platform,
+            automation system, or backend architecture built right — reach out.
           </p>
         </Reveal>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"clamp(24px,4vw,56px)", alignItems:"start" }}>
           <Reveal delay={0.05}>
-            <div className="flex flex-col gap-3">
-              {links.map((l) => (
+            <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+              {LINKS.map(l => (
                 <a
                   key={l.href}
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-3.5 p-4 bg-[#0b0b0e] border border-white/[0.06] rounded-xl text-[#f0f0f2] hover:border-[rgba(200,16,46,0.25)] hover:bg-[#111116] hover:translate-x-1 transition-all duration-200"
+                  style={{
+                    display:"flex",alignItems:"center",gap:14,
+                    padding:"16px 20px",
+                    background:"#0b0b0e",
+                    border:"1px solid rgba(255,255,255,0.06)",
+                    borderRadius:12,
+                    textDecoration:"none",color:"#f0f0f2",
+                    transition:"all 0.2s",
+                  }}
+                  onMouseEnter={e => {
+                    const a = e.currentTarget;
+                    a.style.borderColor="rgba(200,16,46,0.28)";
+                    a.style.background="#0f0f13";
+                    a.style.transform="translateX(5px)";
+                  }}
+                  onMouseLeave={e => {
+                    const a = e.currentTarget;
+                    a.style.borderColor="rgba(255,255,255,0.06)";
+                    a.style.background="#0b0b0e";
+                    a.style.transform="translateX(0)";
+                  }}
                 >
-                  <div
-                    className="w-9 h-9 rounded flex items-center justify-center text-base flex-shrink-0"
-                    style={{ background: "rgba(200,16,46,0.1)", border: "1px solid rgba(200,16,46,0.2)" }}
-                  >
-                    {l.icon}
+                  <div style={{
+                    width:38,height:38,borderRadius:8,flexShrink:0,
+                    background:"rgba(200,16,46,0.1)",
+                    border:"1px solid rgba(200,16,46,0.22)",
+                    display:"flex",alignItems:"center",justifyContent:"center",
+                    fontSize:16,
+                  }}>{l.icon}</div>
+                  <div style={{ flex:1,minWidth:0 }}>
+                    <div className="mono" style={{ fontSize:10,color:"#444455",letterSpacing:"0.08em",marginBottom:2 }}>{l.label}</div>
+                    <div className="mono" style={{ fontSize:13,color:"#f0f0f2",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{l.value}</div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-mono text-[10px] text-[#444455] tracking-[0.08em] mb-0.5">{l.label}</div>
-                    <div className="font-mono text-[13px] text-[#f0f0f2] truncate">{l.value}</div>
-                  </div>
-                  <span className="font-mono text-[#444455] group-hover:text-[#c8102e] group-hover:translate-x-0.5 transition-all duration-200">→</span>
+                  <span className="mono" style={{ color:"#444455",fontSize:16,flexShrink:0,transition:"color 0.2s" }}>→</span>
                 </a>
               ))}
             </div>
           </Reveal>
 
           <Reveal delay={0.1}>
-            <div
-              className="rounded-xl p-7"
-              style={{ background: "#0b0b0e", border: "1px solid rgba(200,16,46,0.2)" }}
-            >
-              <div className="flex items-center gap-2.5 mb-4 font-mono text-[13px] font-medium text-[#22c55e]">
-                <span className="w-2 h-2 rounded-full bg-[#22c55e] shadow-[0_0_10px_#22c55e] animate-[pulse-dot_2s_ease_infinite]" />
-                Available for New Projects
+            <div style={{
+              background:"#0b0b0e",
+              border:"1px solid rgba(200,16,46,0.22)",
+              borderRadius:14,padding:"28px 28px 32px",
+              boxShadow:"0 0 60px rgba(200,16,46,0.04)",
+            }}>
+              <div style={{ display:"flex",alignItems:"center",gap:10,marginBottom:16 }}>
+                <span className="pulse-dot-fast" style={{ width:8,height:8,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 10px #22c55e",display:"inline-block" }} />
+                <span className="mono" style={{ fontSize:13,fontWeight:500,color:"#22c55e" }}>Available for New Projects</span>
               </div>
-              <p className="text-[14px] text-[#8a8a99] leading-[1.75] mb-6">
-                I specialize in Telegram infrastructure. If you need a subscription
-                platform, content pipeline, admin system, or custom bot built to
-                production standards — this is the right conversation to have.
+              <p style={{ fontSize:14,color:"#8a8a99",lineHeight:1.78,marginBottom:24 }}>
+                I specialize in Telegram infrastructure. If you need a subscription platform,
+                content pipeline, admin system, or custom bot built to production standards —
+                this is the right conversation to have.
               </p>
-              <div className="flex flex-col gap-2.5">
-                {specialties.map((s) => (
-                  <div key={s} className="flex items-center gap-2.5 font-mono text-[12px] text-[#8a8a99]">
-                    <span className="w-1 h-1 rounded-full bg-[#c8102e] flex-shrink-0" />
-                    {s}
+              <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+                {SPECS.map(s => (
+                  <div key={s} style={{ display:"flex",alignItems:"center",gap:10 }}>
+                    <span style={{ width:4,height:4,borderRadius:"50%",background:"#c8102e",flexShrink:0,display:"inline-block" }} />
+                    <span className="mono" style={{ fontSize:12,color:"#8a8a99" }}>{s}</span>
                   </div>
                 ))}
               </div>
@@ -87,6 +108,15 @@ export default function Contact() {
           </Reveal>
         </div>
       </div>
+
+      {/* Mobile contact grid */}
+      <style>{`
+        @media (max-width: 640px) {
+          #contact > div > div:last-child {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
