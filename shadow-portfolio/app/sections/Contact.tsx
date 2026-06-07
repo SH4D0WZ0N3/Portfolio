@@ -3,6 +3,7 @@ import SectionLabel from "@/app/components/SectionLabel";
 
 const LINKS = [
   { icon:"✈", label:"TELEGRAM — Preferred", value:"@SH4D0WZ0N3", href:"https://t.me/SH4D0WZ0N3" },
+  { icon:"✈", label:"TELEGRAM — ID", value:"@SH4D0W_D3V", href:"https://t.me/SH4D0W_D3V" },
   { icon:"✉", label:"EMAIL — Encrypted",    value:"sh4d0wz0n3@proton.me", href:"mailto:sh4d0wz0n3@proton.me" },
   { icon:"⌥", label:"GITHUB",               value:"github.com/SH4D0WZ0N3", href:"https://github.com/SH4D0WZ0N3" },
 ];

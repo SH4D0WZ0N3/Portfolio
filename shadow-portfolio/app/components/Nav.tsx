@@ -89,7 +89,7 @@ export default function Nav({ show }: { show: boolean }) {
           (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(200,16,46,0.4)";
         }}
       >
-        Hire Me →
+        Contact Me →
       </button>
     </nav>
   );
